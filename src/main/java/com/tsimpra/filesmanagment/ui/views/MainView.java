@@ -6,9 +6,9 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.server.PWA;
 
-@Route("")
-@PageTitle("Persons")
+
 public class MainView extends AppLayout {
 
     public MainView() {

@@ -1,8 +1,8 @@
-insert into PERSONS values (1,'Steve Watkins','Prime Minister');
-insert into PERSONS values (2,'Bruce Willis','Actor');
-insert into PERSONS values (3,'Martin Falcon','Secretary');
-insert into PERSONS values (4,'Karim Youssoufa','Spaceman');
-insert into PERSONS values (5,'James Dean','Plumber');
+insert into PERSONS values (1,'Prime Minister','Steve Watkins');
+insert into PERSONS values (2,'Actor','Bruce Willis');
+insert into PERSONS values (3,'Secretary','Martin Falcon');
+insert into PERSONS values (4,'Spaceman','Karim Youssoufa');
+insert into PERSONS values (5,'Plumber','James Dean');
 
 insert into TITLES values (1,'Chief',1);
 insert into TITLES values (2,'Arrogant',1);
