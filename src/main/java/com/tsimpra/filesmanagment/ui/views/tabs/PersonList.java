@@ -16,6 +16,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
+import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,7 +112,7 @@ public class PersonList extends VerticalLayout {
             for (Title title: titles) {
                 arr+=title.getName()+",";
             }
-            return arr.substring(0,arr.length()-1)+"]";
+            return arr.length()>1?arr.substring(0,arr.length()-1)+"]":"-";//arr+"]";
         }).setHeader("Titles");
 
         grid.asSingleSelect().addValueChangeListener(ev->{

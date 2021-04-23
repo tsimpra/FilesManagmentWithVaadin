@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tsimpra.filesmanagment.persistence.entity.Person;
 import com.tsimpra.filesmanagment.persistence.entity.Title;
-import com.vaadin.flow.internal.MessageDigestUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -18,27 +17,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class FileUploadHelper {
-    public static String createComponent(String mimeType, String fileName,
-                                      InputStream stream) {
-        if (mimeType.startsWith("text")) {
-            return createTextComponent(stream);
-        }else{
-            try {
-                return IOUtils.toString(stream, StandardCharsets.UTF_8.name());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        String text = String.format("Mime type: '%s'\nSHA-256 hash: '%s'",
-                mimeType, MessageDigestUtil.sha256(stream.toString()));
-        return text;
-
-    }
-
-    public static String createTextComponent(InputStream stream) {
+    public static String convertInputToString(InputStream inputStream) {
         String text;
         try {
-            text = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            text = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             text = "exception reading stream";
         }
@@ -60,7 +42,6 @@ public class FileUploadHelper {
     //returns the list of persons read from the file
     public static List<Person> parseJSONtoList(String result) {
         List<Person> resultingPerson =new ArrayList<>();
-
         Scanner scanner = new Scanner(result);
         while(scanner.hasNext()){
             try {
@@ -75,16 +56,6 @@ public class FileUploadHelper {
         return resultingPerson;
     }
 
-    public static String convertInputToString(InputStream inputStream) {
-        String text;
-        try {
-            text = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            text = "exception reading stream";
-        }
-        return text;
-    }
-
     //takes a csv file to string. Each line respresents an object of type Person
     //Reads each line and creates a Person from the values.First value is the name,second the job
     //and the rest are just Titles of the Person.
@@ -97,14 +68,8 @@ public class FileUploadHelper {
                 Person p = new Person();
                 p.setName(values[0]);
                 p.setJob(values[1]);
-                List<Title> titles = new ArrayList<>();
-                for (int i = 2; i <values.length ; i++) {
-                    Title t = new Title();
-                    values[i]= values[i].replaceAll("\"","");
-                    t.setName(values[i]);
-                    t.setPerson(p);
-                    titles.add(t);
-                }
+                String[] titlesArr = Arrays.copyOfRange(values,2,values.length);
+                List<Title> titles = parseTitles(titlesArr,p);
                 p.setTitles(titles);
                 resultingPerson.add(p);
             }
@@ -133,13 +98,7 @@ public class FileUploadHelper {
                 }
                 if(cells.hasNext()){
                     String[] titles = cells.next().getStringCellValue().split(",");
-                    List<Title> titleList = new ArrayList<>();
-                    for(String title:titles){
-                        Title t = new Title();
-                        t.setName(title);
-                        t.setPerson(p);
-                        titleList.add(t);
-                    }
+                    List<Title> titleList = parseTitles(titles,p);
                     p.setTitles(titleList);
                 }
                 resultingPerson.add(p);
@@ -149,4 +108,17 @@ public class FileUploadHelper {
         }
         return resultingPerson;
     }
+
+    private static List<Title> parseTitles(String[] input,Person p){
+        List<Title> titles = new ArrayList<>();
+        for(String title:input){
+            Title t = new Title();
+            title = title.replaceAll("\"","");
+            t.setName(title);
+            t.setPerson(p);
+            titles.add(t);
+        }
+        return titles;
+    }
 }
+

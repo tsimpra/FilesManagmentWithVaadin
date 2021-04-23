@@ -21,9 +21,11 @@ public class PersonService {
     public Person findById(BigDecimal id){return personRepository.findById(id).orElse(null);}
     public void save(Person p){
         Person entity = personRepository.save(p);
-        for (Title title:p.getTitles()) {
-            title.setPerson(entity);
-            titleRepository.save(title);
+        if(p.getTitles()!=null) {
+            for (Title title : p.getTitles()) {
+                title.setPerson(entity);
+                titleRepository.save(title);
+            }
         }
     }
 }
