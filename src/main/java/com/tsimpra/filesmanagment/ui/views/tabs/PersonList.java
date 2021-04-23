@@ -19,6 +19,7 @@ import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
+import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.ByteArrayInputStream;
@@ -58,9 +59,11 @@ public class PersonList extends VerticalLayout {
     }
 
     private InputStream createResource() {
-        return new ByteArrayInputStream(grid.getSelectedItems().stream()
-                .map(x->x.toString())
-                .reduce("",(x,y)->x+y).getBytes(StandardCharsets.UTF_8));
+        Person p = grid.getSelectedItems().stream().reduce(new Person(),(x,y)->y);
+        return new ByteArrayInputStream(SerializationUtils.serialize(p));
+//        return new ByteArrayInputStream(grid.getSelectedItems().stream()
+//                .map(x->x.toString())
+//                .reduce("",(x,y)->x+y).getBytes(StandardCharsets.UTF_8));
     }
 
     private void configureFileUpload() {
@@ -73,9 +76,9 @@ public class PersonList extends VerticalLayout {
             //String result = createComponent(event.getMIMEType(), event.getFileName(), buffer.getInputStream());
 
             if(event.getMIMEType().startsWith("text")) {
-                String result = FileUploadHelper.convertInputToString(buffer.getInputStream());
+                //String result = FileUploadHelper.convertInputToString(buffer.getInputStream());
                 //Person resultingPerson = FileUploadHelper.parseResult(result);
-                List<Person> persons = FileUploadHelper.parseJSONtoList(result);
+                List<Person> persons = FileUploadHelper.parseJSONtoList(buffer.getInputStream());//result);
                 for (Person p : persons) {
                     personService.save(p);
                 }

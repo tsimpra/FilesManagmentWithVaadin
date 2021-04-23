@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tsimpra.filesmanagment.persistence.entity.Person;
 import com.tsimpra.filesmanagment.persistence.entity.Title;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.SerializationException;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -56,6 +58,24 @@ public class FileUploadHelper {
         return resultingPerson;
     }
 
+    public static List<Person> parseJSONtoList(InputStream input) {
+        List<Person> resultingPerson =new ArrayList<>();
+        try {
+            Scanner scanner = new Scanner(input);
+            //while (scanner.hasNext()) {
+                Person p = SerializationUtils.deserialize(input);
+                resultingPerson.add(p);
+            //}
+        }catch(SerializationException ex){
+            ex.printStackTrace();
+        }/*catch(IOException io){
+            io.printStackTrace();
+        }*/catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return resultingPerson;
+    }
+
     //takes a csv file to string. Each line respresents an object of type Person
     //Reads each line and creates a Person from the values.First value is the name,second the job
     //and the rest are just Titles of the Person.
@@ -79,6 +99,9 @@ public class FileUploadHelper {
         return resultingPerson;
     }
 
+    //takes a xlsx file inputstream. transforms it to Workbook and getting the first sheet
+    //iterates through rows and then through columns and creates a Person object
+    // for each row.
     public static List<Person> parseExcelToList(InputStream inputStream) {
         List<Person> resultingPerson = new ArrayList<>();
         try {

@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "TITLES")
 public class Title implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Id
     @Column(name="ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
