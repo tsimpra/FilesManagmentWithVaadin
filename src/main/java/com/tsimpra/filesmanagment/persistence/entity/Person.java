@@ -1,12 +1,13 @@
 package com.tsimpra.filesmanagment.persistence.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
 @Table(name = "PERSONS")
-public class Person {
+public class Person implements Serializable {
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,8 +25,14 @@ public class Person {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", job='" + job + '\'' +
-                ", titles=[" + titles.stream().map(x->x.toString()).reduce("",(x,y)->x+","+y) +
-                '}';
+                ", titles=[" + titles.stream()
+                .map(x->x.getName())
+                .reduce("",(x,y)->{
+                    if(x.isEmpty()) return y;
+                    if(y.isEmpty()) return x;
+                    return x+","+y;
+                }) +
+                "]}";
     }
 
     public BigDecimal getId() {

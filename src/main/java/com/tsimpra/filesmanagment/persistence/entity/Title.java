@@ -1,11 +1,12 @@
 package com.tsimpra.filesmanagment.persistence.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "TITLES")
-public class Title {
+public class Title implements Serializable {
     @Id
     @Column(name="ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
