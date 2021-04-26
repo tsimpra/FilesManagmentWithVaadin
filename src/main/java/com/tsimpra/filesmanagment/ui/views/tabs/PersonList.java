@@ -17,14 +17,12 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
-import com.vaadin.flow.data.renderer.TextRenderer;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
-import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Route(value = "",layout = MainView.class)
@@ -35,7 +33,7 @@ public class PersonList extends VerticalLayout {
 
     private Grid<Person> grid = new Grid<>(Person.class,false);
     private Upload fileUpload = new Upload();
-    private Anchor download = new Anchor();;
+    private Anchor download = new Anchor();
     private Button downloadButton = new Button(new Icon(VaadinIcon.DOWNLOAD_ALT));
 
     @Autowired
@@ -68,10 +66,7 @@ public class PersonList extends VerticalLayout {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new ByteArrayInputStream(baos.toByteArray());//SerializationUtils.serialize(p));
-//        return new ByteArrayInputStream(grid.getSelectedItems().stream()
-//                .map(x->x.toString())
-//                .reduce("",(x,y)->x+y).getBytes(StandardCharsets.UTF_8));
+        return new ByteArrayInputStream(baos.toByteArray());
     }
 
     private void configureFileUpload() {
@@ -82,16 +77,13 @@ public class PersonList extends VerticalLayout {
 
         fileUpload.addSucceededListener(event -> {
             //String result = createComponent(event.getMIMEType(), event.getFileName(), buffer.getInputStream());
-
             if(event.getMIMEType().startsWith("text")) {
                 String result = FileUploadHelper.convertInputToString(buffer.getInputStream());
-                //Person resultingPerson = FileUploadHelper.parseResult(result);
                 List<Person> persons = FileUploadHelper.parseJSONtoList(result);
                 //List<Person> persons = FileUploadHelper.parseJSONtoList(buffer.getInputStream());
                 for (Person p : persons) {
                     personService.save(p);
                 }
-                //personService.save(resultingPerson);
             }else if(event.getMIMEType().contains("ms-excel")){
                 String result = FileUploadHelper.convertInputToString(buffer.getInputStream());
                 List<Person> persons = FileUploadHelper.parseCSVtoList(result);
@@ -112,7 +104,6 @@ public class PersonList extends VerticalLayout {
         });
         fileUpload.getElement().addEventListener("file-remove", event -> {
         });
-
     }
 
     private void configureGrid(){
@@ -139,6 +130,12 @@ public class PersonList extends VerticalLayout {
                 downloadButton.setEnabled(false);
             }
         });
+
+        grid.setItemDetailsRenderer(new ComponentRenderer<>(person->{
+            HorizontalLayout hl = new HorizontalLayout();
+            hl.add(person.getId().toString());
+            return hl;
+        }));
     }
 
     private void updateList(){

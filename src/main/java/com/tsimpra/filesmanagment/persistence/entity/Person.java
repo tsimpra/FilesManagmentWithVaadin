@@ -30,7 +30,6 @@ public class Person implements Serializable {
     private List<Title> titles;
 
     @Override
-    @JsonValue
     public String toString() {
         return "Person{" +
                 "id=" + id +

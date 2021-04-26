@@ -1,24 +1,16 @@
 package com.tsimpra.filesmanagment.ui.views.helpers;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tsimpra.filesmanagment.persistence.entity.Person;
 import com.tsimpra.filesmanagment.persistence.entity.Title;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SerializationException;
-import org.apache.commons.lang3.SerializationUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.tomcat.util.json.JSONParser;
-import org.apache.tomcat.util.json.ParseException;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
