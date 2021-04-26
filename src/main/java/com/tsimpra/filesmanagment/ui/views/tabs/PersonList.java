@@ -1,5 +1,6 @@
 package com.tsimpra.filesmanagment.ui.views.tabs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tsimpra.filesmanagment.persistence.entity.Person;
 import com.tsimpra.filesmanagment.persistence.entity.Title;
 import com.tsimpra.filesmanagment.persistence.service.PersonService;
@@ -22,8 +23,7 @@ import com.vaadin.flow.server.StreamResource;
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -60,7 +60,15 @@ public class PersonList extends VerticalLayout {
 
     private InputStream createResource() {
         Person p = grid.getSelectedItems().stream().reduce(new Person(),(x,y)->y);
-        return new ByteArrayInputStream(SerializationUtils.serialize(p));
+        ObjectMapper om = new ObjectMapper();
+        var baos = new ByteArrayOutputStream();
+        try {
+            om.writeValue(baos,p);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ByteArrayInputStream(baos.toByteArray());//SerializationUtils.serialize(p));
 //        return new ByteArrayInputStream(grid.getSelectedItems().stream()
 //                .map(x->x.toString())
 //                .reduce("",(x,y)->x+y).getBytes(StandardCharsets.UTF_8));
@@ -76,9 +84,10 @@ public class PersonList extends VerticalLayout {
             //String result = createComponent(event.getMIMEType(), event.getFileName(), buffer.getInputStream());
 
             if(event.getMIMEType().startsWith("text")) {
-                //String result = FileUploadHelper.convertInputToString(buffer.getInputStream());
+                String result = FileUploadHelper.convertInputToString(buffer.getInputStream());
                 //Person resultingPerson = FileUploadHelper.parseResult(result);
-                List<Person> persons = FileUploadHelper.parseJSONtoList(buffer.getInputStream());//result);
+                List<Person> persons = FileUploadHelper.parseJSONtoList(result);
+                //List<Person> persons = FileUploadHelper.parseJSONtoList(buffer.getInputStream());
                 for (Person p : persons) {
                     personService.save(p);
                 }

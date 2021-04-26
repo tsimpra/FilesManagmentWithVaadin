@@ -1,5 +1,9 @@
 package com.tsimpra.filesmanagment.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -13,15 +17,20 @@ public class Person implements Serializable {
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty("id")
     private BigDecimal id;
     @Column(name = "NAME")
+    @JsonProperty("name")
     private String name;
     @Column(name="JOB")
+    @JsonProperty("job")
     private String job;
     @OneToMany(mappedBy = "person",targetEntity = Title.class,orphanRemoval = true,fetch = FetchType.EAGER)
+    @JsonProperty("titles")
     private List<Title> titles;
 
     @Override
+    @JsonValue
     public String toString() {
         return "Person{" +
                 "id=" + id +

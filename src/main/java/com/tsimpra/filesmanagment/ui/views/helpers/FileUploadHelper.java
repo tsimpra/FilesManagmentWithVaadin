@@ -1,5 +1,6 @@
 package com.tsimpra.filesmanagment.ui.views.helpers;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +14,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.tomcat.util.json.JSONParser;
+import org.apache.tomcat.util.json.ParseException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -29,6 +35,7 @@ public class FileUploadHelper {
         return text;
     }
 
+    //Not Used
     public static Person parseResult(String result) {
         Person resultingPerson =null;
         try {
@@ -39,38 +46,40 @@ public class FileUploadHelper {
         return resultingPerson;
     }
 
-    //takes a string with the contents of a file, given the contents are Person objects
-    //given each line is an object it reads the line and creates the Person and adds it to the list
+    //takes a string with the contents of a file, given the contents are serialized json Person objects
+    //reads the string and creates an iterator with the objects. Then loops and creates
+    //a Person and adds it to the list
     //returns the list of persons read from the file
     public static List<Person> parseJSONtoList(String result) {
         List<Person> resultingPerson =new ArrayList<>();
-        Scanner scanner = new Scanner(result);
-        while(scanner.hasNext()){
-            try {
-                Person p  =  new ObjectMapper().readValue(scanner.next(),Person.class);
+        ObjectMapper mapper=new ObjectMapper();
+        try (var parser= mapper.createParser(result)){
+            Iterator<Person> it = parser.readValuesAs(Person.class);
+            while(it.hasNext()){
+                Person p = it.next();
                 resultingPerson.add(p);
-            } catch (JsonMappingException e) {
-                e.printStackTrace();
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return resultingPerson;
     }
 
+    //Not Used
     public static List<Person> parseJSONtoList(InputStream input) {
         List<Person> resultingPerson =new ArrayList<>();
-        try {
-            Scanner scanner = new Scanner(input);
-            //while (scanner.hasNext()) {
-                Person p = SerializationUtils.deserialize(input);
+        try (var in = new ObjectInputStream(input)){
+            while(true) {
+                Person p= (Person) in.readObject();
                 resultingPerson.add(p);
-            //}
+            }
         }catch(SerializationException ex){
             ex.printStackTrace();
         }/*catch(IOException io){
             io.printStackTrace();
-        }*/catch (Exception ex){
+        }*/catch(EOFException eof) {
+            System.out.println("all objects have been read");
+        }catch (Exception ex){
             ex.printStackTrace();
         }
         return resultingPerson;
