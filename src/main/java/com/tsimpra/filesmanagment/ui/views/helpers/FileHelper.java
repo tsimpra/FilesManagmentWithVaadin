@@ -16,7 +16,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class FileUploadHelper {
+public class FileHelper {
     public static String convertInputToString(InputStream inputStream) {
         String text;
         try {
@@ -27,7 +27,7 @@ public class FileUploadHelper {
         return text;
     }
 
-    //Not Used
+    //Not Used. Was used to parse a single Person Object.
     public static Person parseResult(String result) {
         Person resultingPerson =null;
         try {
@@ -57,27 +57,7 @@ public class FileUploadHelper {
         return resultingPerson;
     }
 
-    //Not Used
-    public static List<Person> parseJSONtoList(InputStream input) {
-        List<Person> resultingPerson =new ArrayList<>();
-        try (var in = new ObjectInputStream(input)){
-            while(true) {
-                Person p= (Person) in.readObject();
-                resultingPerson.add(p);
-            }
-        }catch(SerializationException ex){
-            ex.printStackTrace();
-        }/*catch(IOException io){
-            io.printStackTrace();
-        }*/catch(EOFException eof) {
-            System.out.println("all objects have been read");
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        return resultingPerson;
-    }
-
-    //takes a csv file to string. Each line respresents an object of type Person
+    //takes a csv file to string. Each line represents an object of type Person
     //Reads each line and creates a Person from the values.First value is the name,second the job
     //and the rest are just Titles of the Person.
     public static List<Person> parseCSVtoList(String result) {
@@ -133,6 +113,7 @@ public class FileUploadHelper {
         return resultingPerson;
     }
 
+    //helper method to create Titles for a Person
     private static List<Title> parseTitles(String[] input,Person p){
         List<Title> titles = new ArrayList<>();
         for(String title:input){
@@ -143,6 +124,19 @@ public class FileUploadHelper {
             titles.add(t);
         }
         return titles;
+    }
+
+    //Creates a jackson ByteArrayInputStream from a Person data
+    public static InputStream getPersonStream(Person p) {
+        ObjectMapper om = new ObjectMapper();
+        var baos = new ByteArrayOutputStream();
+        try {
+            om.writeValue(baos,p);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ByteArrayInputStream(baos.toByteArray());
     }
 }
 
