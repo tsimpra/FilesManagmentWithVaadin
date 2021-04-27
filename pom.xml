@@ -72,6 +72,14 @@
 			<artifactId>jackson-core</artifactId>
 		</dependency>
 
+		<!-- SpringContent -->
+		<dependency>
+			<groupId>com.github.paulcwarren</groupId>
+			<artifactId>spring-content-fs-boot-starter</artifactId>
+			<version>1.2.2</version>
+		</dependency>
+
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

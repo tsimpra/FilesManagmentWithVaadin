@@ -54,7 +54,7 @@
       "typescript": "4.0.3",
       "webpack-dev-server": "3.11.0"
     },
-    "hash": "1312b1de1ca744e1cc025ac8f6fdc908c3d004734357646b04676ee81883dd7d"
+    "hash": "3a3803ecba13211241f0c8d0d606b99331a7d456ec44ac6465fb12ab803834ef"
   },
   "dependencies": {
     "lit-element": "2.4.0",
@@ -84,7 +84,6 @@
     "@polymer/iron-list": "3.1.0",
     "@vaadin/vaadin-accordion": "1.2.0",
     "@vaadin/vaadin-list-box": "1.4.0",
-    "@vaadin/vaadin-checkbox": "2.5.0",
     "@vaadin/vaadin-details": "1.2.0",
     "@polymer/iron-icon": "3.0.1",
     "@vaadin/vaadin-time-picker": "2.4.0",

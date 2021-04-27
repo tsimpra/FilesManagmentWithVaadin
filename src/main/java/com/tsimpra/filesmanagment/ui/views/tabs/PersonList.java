@@ -2,14 +2,17 @@ package com.tsimpra.filesmanagment.ui.views.tabs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tsimpra.filesmanagment.persistence.entity.Person;
+import com.tsimpra.filesmanagment.persistence.entity.PersonalDocument;
 import com.tsimpra.filesmanagment.persistence.entity.Title;
 import com.tsimpra.filesmanagment.persistence.service.PersonService;
+import com.tsimpra.filesmanagment.persistence.service.PersonalDocumentService;
 import com.tsimpra.filesmanagment.persistence.service.TitleService;
 import com.tsimpra.filesmanagment.ui.views.MainView;
 import com.tsimpra.filesmanagment.ui.views.helpers.FileUploadHelper;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -30,6 +33,7 @@ public class PersonList extends VerticalLayout {
 
     private PersonService personService;
     private TitleService titleService;
+    private PersonalDocumentService documentService;
 
     private Grid<Person> grid = new Grid<>(Person.class,false);
     private Upload fileUpload = new Upload();
@@ -37,9 +41,11 @@ public class PersonList extends VerticalLayout {
     private Button downloadButton = new Button(new Icon(VaadinIcon.DOWNLOAD_ALT));
 
     @Autowired
-    public PersonList(PersonService personService,TitleService titleService) {
+    public PersonList(PersonService personService,
+                      TitleService titleService,PersonalDocumentService documentService) {
         this.personService=personService;
         this.titleService=titleService;
+        this.documentService = documentService;
 
         download.getElement().setAttribute("download", true);
         download.add(downloadButton);
@@ -73,7 +79,7 @@ public class PersonList extends VerticalLayout {
         MemoryBuffer buffer = new MemoryBuffer();
         fileUpload.setReceiver(buffer);//Upload upload = new Upload(buffer);
         fileUpload.setAcceptedFileTypes(".csv",".txt",".xlsx");
-        fileUpload.setMaxFileSize(30000);
+        fileUpload.setMaxFileSize(3000);
 
         fileUpload.addSucceededListener(event -> {
             //String result = createComponent(event.getMIMEType(), event.getFileName(), buffer.getInputStream());
@@ -115,27 +121,54 @@ public class PersonList extends VerticalLayout {
             for (Title title: titles) {
                 arr+=title.getName()+",";
             }
-            return arr.length()>1?arr.substring(0,arr.length()-1)+"]":"-";//arr+"]";
+            return arr.length()>1?arr.substring(0,arr.length()-1)+"]":"-";
         }).setHeader("Titles");
 
-        grid.asSingleSelect().addValueChangeListener(ev->{
-            if(grid.getSelectedItems().size()>0) {
-                download.setHref(
-                        new StreamResource("Person"+ev.getValue().getName().replaceAll(" ","")+".txt",
-                        () ->createResource())
-                );
-                downloadButton.setEnabled(true);
-            }else{
-                download.removeHref();
-                downloadButton.setEnabled(false);
-            }
-        });
+        grid.asSingleSelect().addValueChangeListener(ev-> configureSingleSelect(ev.getValue()));
 
-        grid.setItemDetailsRenderer(new ComponentRenderer<>(person->{
-            HorizontalLayout hl = new HorizontalLayout();
-            hl.add(person.getId().toString());
-            return hl;
-        }));
+        grid.setItemDetailsRenderer(new ComponentRenderer<>(person-> configureItemsDetails(person)));
+    }
+
+    private void configureSingleSelect(Person person){
+        if(grid.getSelectedItems().size()>0) {
+            download.setHref(
+                    new StreamResource("Person"+person.getName().replaceAll(" ","")+".txt",
+                            () ->createResource())
+            );
+            downloadButton.setEnabled(true);
+        }else{
+            download.removeHref();
+            downloadButton.setEnabled(false);
+        }
+    }
+
+    private HorizontalLayout configureItemsDetails(Person person){
+        HorizontalLayout hl = new HorizontalLayout();
+        if(person.getPersonalDocument()!=null){
+            hl.add(new Label(person.getPersonalDocument().getName()));
+        }else{
+            MemoryBuffer buffer = new MemoryBuffer();
+            Upload personalDocUpload = new Upload(buffer);
+            personalDocUpload.setMaxFileSize(3000);
+            personalDocUpload.setMaxFiles(1);
+            personalDocUpload.addSucceededListener(event->{
+               //save file to personal docs
+                PersonalDocument doc = new PersonalDocument();
+                doc.setPerson(person);
+                doc.setName(event.getFileName());
+                doc.setContentLength(event.getContentLength());
+                //doc service to save
+                documentService.savePersonalDocument(doc,buffer.getInputStream());
+                updateList();
+            });
+            personalDocUpload.addFileRejectedListener(event -> {
+                Notification.show(event.getErrorMessage());
+            });
+            personalDocUpload.getElement().addEventListener("file-remove", event -> {
+            });
+            hl.add(personalDocUpload);
+        }
+        return hl;
     }
 
     private void updateList(){

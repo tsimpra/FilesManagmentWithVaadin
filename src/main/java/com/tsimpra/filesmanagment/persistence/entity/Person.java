@@ -1,8 +1,7 @@
 package com.tsimpra.filesmanagment.persistence.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -28,6 +27,10 @@ public class Person implements Serializable {
     @OneToMany(mappedBy = "person",targetEntity = Title.class,orphanRemoval = true,fetch = FetchType.EAGER)
     @JsonProperty("titles")
     private List<Title> titles;
+    @OneToOne(mappedBy = "person",targetEntity = PersonalDocument.class,orphanRemoval = true)
+    @JoinColumn(name="PERSONAL_DOCUMENT_ID",referencedColumnName = "ID")
+    @JsonIgnore
+    private PersonalDocument personalDocument;
 
     @Override
     public String toString() {
@@ -43,6 +46,14 @@ public class Person implements Serializable {
                     return x+","+y;
                 }) +
                 "]}";
+    }
+
+    public PersonalDocument getPersonalDocument() {
+        return personalDocument;
+    }
+
+    public void setPersonalDocument(PersonalDocument personalDocument) {
+        this.personalDocument = personalDocument;
     }
 
     public BigDecimal getId() {
