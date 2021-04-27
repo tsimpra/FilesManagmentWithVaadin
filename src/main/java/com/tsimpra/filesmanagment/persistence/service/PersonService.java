@@ -20,11 +20,13 @@ public class PersonService {
     public List<Person> findAll(){return personRepository.findAll();}
     public Person findById(BigDecimal id){return personRepository.findById(id).orElse(null);}
     public void save(Person p){
-        Person entity = personRepository.save(p);
-        if(p.getTitles()!=null) {
-            for (Title title : p.getTitles()) {
-                title.setPerson(entity);
-                titleRepository.save(title);
+        if(p.getId()==null || !personRepository.existsById(p.getId())) {
+            Person entity = personRepository.save(p);
+            if (p.getTitles() != null) {
+                for (Title title : p.getTitles()) {
+                    title.setPerson(entity);
+                    titleRepository.save(title);
+                }
             }
         }
     }
