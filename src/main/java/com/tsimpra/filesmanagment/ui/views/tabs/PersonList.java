@@ -5,7 +5,7 @@ import com.tsimpra.filesmanagment.persistence.entity.PersonalDocument;
 import com.tsimpra.filesmanagment.persistence.entity.Title;
 import com.tsimpra.filesmanagment.persistence.service.PersonService;
 import com.tsimpra.filesmanagment.persistence.service.PersonalDocumentService;
-import com.tsimpra.filesmanagment.ui.views.MainView;
+import com.tsimpra.filesmanagment.ui.views.MainLayout;
 import com.tsimpra.filesmanagment.ui.views.helpers.FileHelper;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-@Route(value = "",layout = MainView.class)
+@Route(value = "",layout = MainLayout.class)
 public class PersonList extends VerticalLayout {
 
     private PersonService personService;
@@ -116,7 +116,7 @@ public class PersonList extends VerticalLayout {
         }else{
             MemoryBuffer buffer = new MemoryBuffer();
             Upload personalDocUpload = new Upload(buffer);
-            personalDocUpload.setMaxFileSize(3000);
+            personalDocUpload.setMaxFileSize(1048576);
             personalDocUpload.setMaxFiles(1);
             personalDocUpload.setDropAllowed(false);
             personalDocUpload.setSizeUndefined();
@@ -150,7 +150,7 @@ public class PersonList extends VerticalLayout {
         MemoryBuffer buffer = new MemoryBuffer();
         fileUpload.setReceiver(buffer);
         fileUpload.setAcceptedFileTypes(".csv",".txt",".xlsx");
-        fileUpload.setMaxFileSize(3000);
+        fileUpload.setMaxFileSize(10000);
 
         fileUpload.addSucceededListener(event -> {
             if(event.getMIMEType().startsWith("text")) {

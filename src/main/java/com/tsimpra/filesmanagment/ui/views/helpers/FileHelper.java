@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tsimpra.filesmanagment.persistence.entity.Person;
 import com.tsimpra.filesmanagment.persistence.entity.Title;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.SerializationException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
